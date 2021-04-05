@@ -4,6 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const admin = require("firebase-admin");
 require('dotenv').config();
 const port = process.env.PORT || 4200
 
@@ -11,6 +12,16 @@ const port = process.env.PORT || 4200
 app.use(cors());
 app.use(bodyParser.json());
 console.log(process.env.DB_USER)
+
+
+
+
+var serviceAccount = require("./configs/full-stack-client-assignment-firebase-adminsdk-u7o2a-830507d9b4.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://full-stack-client-assignment.firebaseio.com"
+});
 
 
 app.get('/', (req, res) => {
@@ -48,6 +59,58 @@ client.connect(err => {
         console.log('delete this product', id)
         productCollection.findOneAndDelete({ _id: id })
             .then(documents => { console.log(documents) })
+    })
+
+});
+
+
+const uriOrder = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.adxso.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const clientOrder = new MongoClient(uriOrder, { useNewUrlParser: true, useUnifiedTopology: true });
+clientOrder.connect(err => {
+    const orderCollection = client.db("full-stack-assignment-order-database").collection("orders");
+
+
+    app.post('/orders', (req, res) => {
+        const newOrder = req.body;
+        orderCollection.insertOne(newOrder)
+            .then(result => {
+                res.send(result.insertedCount > 0)
+            })
+        console.log(newOrder)
+    })
+
+    app.get('/showOrders', (req, res) => {
+        const bearer = req.headers.authorization;
+        if (bearer && bearer.startsWith('Bearer ')) {
+            const idToken = bearer.split(' ')[1];
+            console.log({ idToken })
+            admin
+                .auth()
+                .verifyIdToken(idToken)
+                .then((decodedToken) => {
+                    const tokenEmail = decodedToken.email;
+                    const queryEmail = req.query.email;
+                    if (tokenEmail == queryEmail) {
+                        orderCollection.find({ email: queryEmail })
+                            .toArray((err, documents) => {
+                                res.status(200).send(documents)
+                                console.log(err)
+                            })
+                    }
+                    // else {
+                    //     res.status(401).send('Un-authorized Access')
+                    // }
+                    console.log({ tokenEmail })
+                })
+                .catch((error) => {
+                    console.log(error)
+                    res.status(401).send('Un-authorized Access')
+                });
+        }
+        else {
+            res.status(401).send('Un-authorized Access')
+        }
+
     })
 
 });
