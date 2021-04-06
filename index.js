@@ -59,7 +59,7 @@ client.connect(err => {
         console.log('delete this product', id)
         productCollection.findOneAndDelete({ _id: req.params.id })
             .then(result => {
-                //         res.send(result.deletedCount > 0)
+                res.send(result.deletedCount > 0)
                 console.log(result)
             })
     })
