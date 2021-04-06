@@ -55,14 +55,19 @@ client.connect(err => {
 
 
     app.delete('/deleteProduct/:id', (req, res) => {
-        const id = ObjectID(req.params.id);
+        // const id = ObjectID(req.params.id);
         console.log('delete this product', id)
-        productCollection.findOneAndDelete({ _id: req.params.id })
+        // productCollection.findOneAndDelete({ _id: req.params.id })
+        //     .then(result => {
+        //         res.send(result.deletedCount > 0)
+        //         console.log(result)
+        //     })
+        //     .catch(err => console.error(`Failed to find and delete document: ${err}`))
+        productCollection.deleteOne({ _id: ObjectID(req.params.id) })
+
             .then(result => {
                 res.send(result.deletedCount > 0)
-                console.log(result)
             })
-            .catch(err => console.error(`Failed to find and delete document: ${err}`))
     })
 
 });
