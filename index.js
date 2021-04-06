@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient;
-const objectId = require('mongodb').ObjectID;
+const ObjectID = require('mongodb').ObjectID,
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const admin = require("firebase-admin");
@@ -55,7 +55,7 @@ client.connect(err => {
 
 
     app.delete('/deleteProduct/:id', (req, res) => {
-        const id = objectId(req.params.id);
+        const id = ObjectID(req.params.id);
         console.log('delete this product', id)
         productCollection.findOneAndDelete({ _id: req.params.id })
             .then(result => {
