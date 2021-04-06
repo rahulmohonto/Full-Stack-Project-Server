@@ -62,6 +62,7 @@ client.connect(err => {
                 res.send(result.deletedCount > 0)
                 console.log(result)
             })
+            .catch(err => console.error(`Failed to find and delete document: ${err}`))
     })
 
 });
