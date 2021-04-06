@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient;
-const ObjectID = require('mongodb').ObjectID;
+const objectId = require('mongodb').ObjectID;
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const admin = require("firebase-admin");
@@ -63,7 +63,7 @@ client.connect(err => {
         //         console.log(result)
         //     })
         //     .catch(err => console.error(`Failed to find and delete document: ${err}`))
-        productCollection.deleteOne({ _id: ObjectID(req.params.id) })
+        productCollection.deleteOne({ _id: objectId(req.params.id) })
 
             .then(result => {
                 res.send(result.deletedCount > 0)
